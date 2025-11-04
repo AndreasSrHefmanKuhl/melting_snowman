@@ -1,6 +1,6 @@
 # game_logic.py
 import random
-from ascii_art import STAGES  # Import the STAGES art
+from ascii_art import STAGES
 
 # List of secret words
 WORDS = ["python", "git", "github", "snowman", "meltdown"]
@@ -15,7 +15,13 @@ def get_random_word():
 
 
 def display_game_state(mistakes, secret_word, guessed_letters):
-    """Prints the current snowman stage and the masked word."""
+    """Prints the current snowman stage, the masked word, and game stats."""
+
+    # Clearer Display Enhancement
+    print("-" * 40)
+    print(f"| Mistakes: {mistakes} / {MAX_MISTAKES} | Remaining: {MAX_MISTAKES - mistakes} |")
+    print("-" * 40)
+
     # Display the snowman stage for the current number of mistakes.
     print(STAGES[mistakes])
 
@@ -27,14 +33,34 @@ def display_game_state(mistakes, secret_word, guessed_letters):
             display_word += letter + " "
         else:
             display_word += "_ "
-            is_word_guessed = False  # If any letter is missing, the word isn't guessed
+            is_word_guessed = False
 
     print("Word: ", display_word)
     print("Guessed letters: ", ", ".join(sorted(guessed_letters)))
-    print(f"Mistakes remaining: {MAX_MISTAKES - mistakes}")
     print("\n")
 
     return is_word_guessed
+
+
+def get_valid_guess(guessed_letters):
+    """Prompts the user for a guess with Input Validation."""
+    while True:
+        guess = input("Guess a letter: ").lower()
+
+        # Input Validation Enhancement
+        if not guess.isalpha():
+            print("🚨 Invalid guess. Please enter an alphabetical character only.")
+            continue
+
+        if len(guess) != 1:
+            print("🚨 Invalid guess. Please enter *only one* letter at a time.")
+            continue
+
+        if guess in guessed_letters:
+            print(f"🚨 You already guessed '{guess}'. Try a different letter.")
+            continue
+
+        return guess
 
 
 def play_game():
@@ -48,44 +74,43 @@ def play_game():
 
     # --- Main Game Loop ---
     while not game_over:
-        # 1. Display current state and check for win
         is_word_guessed = display_game_state(mistakes, secret_word, guessed_letters)
 
-        # Check for immediate win (if all letters were guessed in the last turn)
+        # Check for immediate win
         if is_word_guessed:
-            print(f"*** CONGRATULATIONS! You saved the snowman! ***")
+            print(f"*** 🏆 CONGRATULATIONS! You saved the snowman! 🏆 ***")
             print(f"The word was '{secret_word}'.")
             game_over = True
-            continue  # Skip to the end of the loop
+            continue
 
         # Check for loss
         if mistakes >= MAX_MISTAKES:
-            print(STAGES[MAX_MISTAKES])  # Display fully melted snowman
-            print("--- GAME OVER! ---")
-            print(f"The snowman melted. The word was '{secret_word}'.")
+            print(STAGES[MAX_MISTAKES])
+            print("--- 🥶 GAME OVER! The snowman melted! 🥵 ---")
+            print(f"The word was '{secret_word}'.")
             game_over = True
-            continue  # Skip to the end of the loop
-
-        # 2. Get and validate guess
-        guess = input("Guess a letter: ").lower()
-
-        if not guess.isalpha() or len(guess) != 1:
-            print("Invalid guess. Please enter a single letter.")
             continue
 
-        if guess in guessed_letters:
-            print(f"You already guessed '{guess}'. Try a different letter.")
-            continue
+        # Get and process valid guess
+        guess = get_valid_guess(guessed_letters)
 
-        # 3. Process guess
         guessed_letters.append(guess)
 
         if guess in secret_word:
-            print(f"** Correct! The letter '{guess}' is in the word. **")
+            print(f"** ✅ Correct! The letter '{guess}' is in the word. **")
         else:
-            print(f"-- Incorrect! The letter '{guess}' is not in the word. --")
-            mistakes += 1  # Increment mistakes
+            print(f"-- ❌ Incorrect! The letter '{guess}' is not in the word. --")
+            mistakes += 1
+
+        # --- Replay Option Main Block ---
 
 
 if __name__ == "__main__":
-    play_game()
+    while True:
+        play_game()
+
+        # Replay Option Enhancement
+        play_again = input("\nDo you want to play again? (yes/no): ").lower()
+        if play_again != 'yes':
+            print("Thanks for playing Snowman Meltdown! Goodbye.")
+            break
