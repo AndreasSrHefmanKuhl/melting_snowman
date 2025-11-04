@@ -102,15 +102,7 @@ def play_game():
             print(f"-- ❌ Incorrect! The letter '{guess}' is not in the word. --")
             mistakes += 1
 
-        # --- Replay Option Main Block ---
 
 
-if __name__ == "__main__":
-    while True:
-        play_game()
 
-        # Replay Option Enhancement
-        play_again = input("\nDo you want to play again? (yes/no): ").lower()
-        if play_again != 'yes':
-            print("Thanks for playing Snowman Meltdown! Goodbye.")
-            break
+
